@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laporan Pesanan - Dapur Nyonya</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #fff8f0;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #b6462e;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #b6462e;
+      color: white;
+    }
+
+    footer {
+      background-color: #b6462e;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Laporan Pesanan</h1>
+  </header>
+
+  <div class="container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Total</th>
+          <th>Metode Pembayaran</th>
+          <th>Pesanan</th>
+        </tr>
+      </thead>
+      <tbody id="laporan-body">
+        <!-- Data akan dimuat di sini -->
+      </tbody>
+    </table>
+  </div>
+
+  <footer>
+    &copy; 2025 Dapur Nyonya. All rights reserved.
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script>
+    // Konfigurasi Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyC7hWmV-OPp1APlKVHCp_yjvG0e8wsf-Ic",
+      authDomain: "websitedapurnyonya.firebaseapp.com",
+      projectId: "websitedapurnyonya",
+      storageBucket: "websitedapurnyonya.appspot.com",
+      messagingSenderId: "910833649328",
+      appId: "1:910833649328:web:3d779a479b55a26dfc5d75"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const laporanBody = document.getElementById("laporan-body");
+
+    // Ambil data pesanan dari Firestore
+    db.collection("pesanan").get().then(snapshot => {
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const id = data.id || doc.id;  // Jika tidak ada id dalam data, ambil dari doc.id
+        const total = data.total || 0;
+        const metodePembayaran = data.metode_pembayaran || "Tidak diketahui";
+        const pesanan = (data.pesanan || []).map(item => `${item.nama} (x${item.jumlah})`).join(", ");
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+          <td>${id}</td>
+          <td>Rp ${total}</td>
+          <td>${metodePembayaran}</td>
+          <td>${pesanan}</td>
+        `;
+
+        laporanBody.appendChild(row);
+      });
+    }).catch(error => {
+      console.error("Gagal memuat data pesanan:", error);
+    });
+  </script>
+
+</body>
+</html>

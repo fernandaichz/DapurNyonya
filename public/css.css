@@ -1,0 +1,56 @@
+.hero-text {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 20px 30px;
+    border-radius: 12px;
+    font-size: 2.5em;
+    text-transform: uppercase;
+    background-image: url(https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.tripadvisor.co.id%2FRestaurants-g297715-zfp63-Surabaya_East_Java_Java.html&psig=AOvVaw0lTVrdZ1fcN5T9znw9nvLD&ust=1745678158105000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCKCT1Ie084wDFQAAAAAdAAAAABAE);
+  }
+  header {
+    background-color: #b6462e;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  
+  .header-left {
+    text-align: left;
+  }
+  
+  .header-right {
+    text-align: right;
+  }
+  
+  .login-button {
+    background-color: white;
+    color: #b6462e;
+    padding: 10px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .login-button:hover {
+    background-color: #f5d1b3;
+    color: #b6462e;
+  }
+  
+  /* CSS untuk gambar QRIS */
+#qris-img {
+  display: none; /* Secara default gambar disembunyikan */
+  width: 100%;   /* Sesuaikan dengan ukuran kontainer */
+  max-width: 400px; /* Batas maksimal ukuran gambar */
+  margin: 20px auto; /* Memberikan jarak atas/bawah dan meletakkan gambar di tengah */
+  border-radius: 8px; /* Untuk memberikan efek sudut yang melengkung pada gambar */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Tambahkan bayangan ringan untuk efek visual */
+}
+
+/* Jika gambar QRIS perlu ditampilkan, pengaturan ini akan berlaku saat metode QRIS dipilih */
+#qris-img.show {
+  display: block; /* Menampilkan gambar jika QRIS terpilih */
+}
+

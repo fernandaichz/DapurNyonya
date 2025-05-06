@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daftar Pesanan - Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #fff8f0;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #b6462e;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+    }
+
+    .pesanan-container {
+      padding: 20px;
+    }
+
+    .pesanan-card {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      padding: 15px;
+    }
+
+    .pesanan-card h3 {
+      margin: 0 0 10px;
+      color: #b6462e;
+    }
+
+    .pesanan-card p {
+      margin: 5px 0;
+      color: #333;
+    }
+
+    footer {
+      background-color: #b6462e;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Daftar Pesanan (Admin)</h1>
+</header>
+
+<div class="pesanan-container" id="daftar-pesanan">
+  <!-- Data pesanan akan dimuat di sini -->
+</div>
+
+<footer>
+  &copy; 2025 Dapur Nyonya. All rights reserved.
+</footer>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script>
+  // Konfigurasi Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyC7hWmV-OPp1APlKVHCp_yjvG0e8wsf-Ic",
+    authDomain: "websitedapurnyonya.firebaseapp.com",
+    projectId: "websitedapurnyonya",
+    storageBucket: "websitedapurnyonya.appspot.com",
+    messagingSenderId: "910833649328",
+    appId: "1:910833649328:web:3d779a479b55a26dfc5d75"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const daftarPesanan = document.getElementById("daftar-pesanan");
+
+  db.collection("pesanan").orderBy("waktu", "desc").get().then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const card = document.createElement("div");
+      card.className = "pesanan-card";
+
+      const waktuFormatted = data.waktu?.seconds
+        ? new Date(data.waktu.seconds * 1000).toLocaleString()
+        : 'Tidak diketahui';
+
+      // Format menu yang dipesan
+      let daftarMenu = "Tidak tersedia";
+      if (Array.isArray(data.item)) {
+        daftarMenu = data.item.map(menu => {
+          const nama = menu.nama || "Tanpa Nama";
+          const jumlah = menu.jumlah || 0;
+          const harga = menu.harga || 0;
+          return `${nama} x${jumlah} = Rp${jumlah * harga}`;
+        }).join("<br>");
+      }
+
+      card.innerHTML = `
+        <p><strong>Waktu:</strong> ${waktuFormatted}</p>
+        <p><strong>Metode Pembayaran:</strong> ${data.metode_pembayaran || 'Tidak diketahui'}</p>
+        <p><strong>Total:</strong> Rp${data.total}</p>
+        <p><strong>Menu Dipesan:</strong><br>${daftarMenu}</p>
+      `;
+      daftarPesanan.appendChild(card);
+    });
+  });
+</script>
+
+</body>
+</html>

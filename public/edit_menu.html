@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kelola Menu - Dapur Nyonya</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #fff8f0;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #b6462e;
+      margin-bottom: 20px;
+    }
+    .toolbar {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+      gap: 10px;
+    }
+    .toolbar button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #b6462e;
+      color: white;
+      font-weight: 600;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .toolbar button.active {
+      background-color: #f5d1b3;
+      color: #b6462e;
+    }
+    .form-section {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .form-section label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+    .form-section input, .form-section textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .form-section button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      background-color: #b6462e;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Kelola Menu</h1>
+
+  <div class="toolbar">
+    <button id="btn-add" class="active">Tambah Menu</button>
+    <button id="btn-edit">Edit Menu</button>
+    <button id="btn-delete">Hapus Menu</button>
+  </div>
+
+  <div id="form-add" class="form-section">
+    <h2>Tambah Menu Baru</h2>
+    <label>Nama</label>
+    <input type="text" id="add-nama">
+    <label>Deskripsi</label>
+    <textarea id="add-deskripsi"></textarea>
+    <label>Harga</label>
+    <input type="number" id="add-harga">
+    <label>URL Gambar</label>
+    <input type="text" id="add-gambar">
+    <button onclick="tambahMenu()">Tambah Menu</button>
+  </div>
+
+  <div id="form-edit" class="form-section hidden">
+    <h2>Edit Menu</h2>
+    <label>ID Menu</label>
+    <input type="text" id="edit-id">
+    <label>Nama</label>
+    <input type="text" id="edit-nama">
+    <label>Deskripsi</label>
+    <textarea id="edit-deskripsi"></textarea>
+    <label>Harga</label>
+    <input type="number" id="edit-harga">
+    <label>URL Gambar</label>
+    <input type="text" id="edit-gambar">
+    <button onclick="editMenu()">Simpan Perubahan</button>
+  </div>
+
+  <div id="form-delete" class="form-section hidden">
+    <h2>Hapus Menu</h2>
+    <label>Nama Menu</label>
+    <input type="text" id="delete-nama" placeholder="Masukkan nama menu...">
+    <button onclick="hapusMenu()">Hapus Menu</button>
+  </div>  
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Konfigurasi Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyC7hWmV-OPp1APlKVHCp_yjvG0e8wsf-Ic",
+      authDomain: "websitedapurnyonya.firebaseapp.com",
+      projectId: "websitedapurnyonya",
+      storageBucket: "websitedapurnyonya.appspot.com",
+      messagingSenderId: "910833649328",
+      appId: "1:910833649328:web:3d779a479b55a26dfc5d75"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Fungsi Toolbar
+    const btnAdd = document.getElementById('btn-add');
+    const btnEdit = document.getElementById('btn-edit');
+    const btnDelete = document.getElementById('btn-delete');
+    const formAdd = document.getElementById('form-add');
+    const formEdit = document.getElementById('form-edit');
+    const formDelete = document.getElementById('form-delete');
+
+    btnAdd.addEventListener('click', () => {
+      showForm('add');
+    });
+
+    btnEdit.addEventListener('click', () => {
+      showForm('edit');
+    });
+
+    btnDelete.addEventListener('click', () => {
+      showForm('delete');
+    });
+
+    function showForm(type) {
+      formAdd.classList.add('hidden');
+      formEdit.classList.add('hidden');
+      formDelete.classList.add('hidden');
+      btnAdd.classList.remove('active');
+      btnEdit.classList.remove('active');
+      btnDelete.classList.remove('active');
+
+      if (type === 'add') {
+        formAdd.classList.remove('hidden');
+        btnAdd.classList.add('active');
+      } else if (type === 'edit') {
+        formEdit.classList.remove('hidden');
+        btnEdit.classList.add('active');
+      } else if (type === 'delete') {
+        formDelete.classList.remove('hidden');
+        btnDelete.classList.add('active');
+      }
+    }
+
+    // Fungsi Tambah
+    function tambahMenu() {
+      const nama = document.getElementById('add-nama').value;
+      const deskripsi = document.getElementById('add-deskripsi').value;
+      const harga = parseInt(document.getElementById('add-harga').value);
+      const gambar = document.getElementById('add-gambar').value;
+
+      db.collection('menus').add({
+        nama,
+        deskripsi,
+        harga,
+        gambar
+      }).then(() => {
+        alert('Menu berhasil ditambahkan!');
+        window.location.reload();
+      }).catch(error => {
+        console.error('Error:', error);
+      });
+    }
+
+    // Fungsi Edit
+    function editMenu() {
+  const nama = document.getElementById('edit-nama').value.trim();
+  const deskripsi = document.getElementById('edit-deskripsi').value;
+  const harga = parseInt(document.getElementById('edit-harga').value);
+  const gambar = document.getElementById('edit-gambar').value;
+
+  if (!nama) {
+    alert('Masukkan nama menu yang ingin diedit.');
+    return;
+  }
+
+  db.collection('menus')
+    .where('nama', '==', nama)
+    .get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        alert(`Menu dengan nama "${nama}" tidak ditemukan.`);
+        return;
+      }
+
+      snapshot.forEach(doc => {
+        db.collection('menus').doc(doc.id).update({
+          nama,
+          deskripsi,
+          harga,
+          gambar
+        })
+        .then(() => {
+          alert(`Menu "${nama}" berhasil diupdate!`);
+          window.location.reload();
+        })
+        .catch(error => {
+          console.error('Gagal mengupdate menu:', error);
+          alert('Gagal mengupdate menu.');
+        });
+      });
+    })
+    .catch(error => {
+      console.error('Terjadi kesalahan saat mencari menu:', error);
+      alert('Terjadi kesalahan saat mencari menu.');
+    });
+}
+
+
+    // Fungsi Hapus
+    function hapusMenu() {
+  const nama = document.getElementById('delete-nama').value.trim();
+
+  if (!nama) {
+    alert('Masukkan nama menu yang ingin dihapus.');
+    return;
+  }
+
+  db.collection('menus')
+    .where('nama', '==', nama)
+    .get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        alert(`Menu dengan nama "${nama}" tidak ditemukan.`);
+        return;
+      }
+
+      if (confirm(`Yakin mau menghapus menu "${nama}"?`)) {
+        snapshot.forEach(doc => {
+          db.collection('menus').doc(doc.id).delete()
+            .then(() => {
+              console.log(`Berhasil menghapus menu ${nama}`);
+              alert(`Menu "${nama}" berhasil dihapus.`);
+              window.location.reload();
+            })
+            .catch(error => {
+              console.error('Gagal menghapus menu:', error);
+              alert('Gagal menghapus menu.');
+            });
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Error mencari menu:', error);
+      alert('Terjadi kesalahan saat mencari menu.');
+    });
+}
+
+  </script>
+
+</body>
+</html>

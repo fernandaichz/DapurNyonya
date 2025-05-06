@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pesan Sekarang - Dapur Nyonya</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #fff8f0;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #b6462e;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+    }
+
+    .cart-toolbar {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #6fdf43;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+
+    .cart-icon {
+      font-size: 20px;
+      margin-right: 8px;
+    }
+
+    .cart-count {
+      background-color: white;
+      color: #b6462e;
+      padding: 4px 8px;
+      border-radius: 50px;
+      font-weight: bold;
+    }
+
+    .search-container {
+      text-align: center;
+      padding: 10px 20px;
+    }
+
+    .search-container input {
+      padding: 10px;
+      width: 80%;
+      max-width: 400px;
+      font-size: 1em;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .menu-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 20px;
+      justify-content: center;
+    }
+
+    .menu-card {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 250px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .menu-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .menu-card h3 {
+      margin: 10px 0 5px;
+      color: #b6462e;
+    }
+
+    .menu-card p {
+      font-size: 0.95em;
+      color: #555;
+    }
+
+    .order-button {
+      margin-top: 10px;
+      padding: 10px 15px;
+      background-color: #b6462e;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .order-button:hover {
+      background-color: #93361e;
+    }
+
+    footer {
+      background-color: #b6462e;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Pesan Sekarang</h1>
+</header>
+
+<!-- Pencarian Menu -->
+<div class="search-container">
+  <input type="text" id="search-input" placeholder="Cari menu...">
+</div>
+
+<!-- Daftar Menu -->
+<div class="menu-container" id="menu-list">
+  <!-- Data menu akan ditampilkan di sini -->
+</div>
+
+<footer>
+  &copy; 2025 Dapur Nyonya. All rights reserved.
+</footer>
+
+<!-- Toolbar Keranjang -->
+<div class="cart-toolbar" onclick="window.location.href='keranjang.html'">
+  <span class="cart-icon">🛒</span>
+  <span class="cart-count" id="cart-count">0</span>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyC7hWmV-OPp1APlKVHCp_yjvG0e8wsf-Ic",
+    authDomain: "websitedapurnyonya.firebaseapp.com",
+    projectId: "websitedapurnyonya",
+    storageBucket: "websitedapurnyonya.appspot.com",
+    messagingSenderId: "910833649328",
+    appId: "1:910833649328:web:3d779a479b55a26dfc5d75"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const menuList = document.getElementById("menu-list");
+
+  function updateCartCount() {
+    const keranjang = JSON.parse(localStorage.getItem("keranjang")) || [];
+    const total = keranjang.reduce((sum, item) => sum + item.jumlah, 0);
+    document.getElementById("cart-count").innerText = total;
+  }
+
+  // Tampilkan menu
+  let semuaMenu = [];
+
+  db.collection("menus").get().then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const id = doc.id;
+      semuaMenu.push({ id, ...data });
+    });
+
+    tampilkanMenu(semuaMenu);
+    updateCartCount();
+  });
+
+  function tampilkanMenu(menuArray) {
+    menuList.innerHTML = "";
+    menuArray.forEach((data) => {
+      const card = document.createElement("div");
+      card.className = "menu-card";
+      card.innerHTML = `
+        <img src="${data.gambar || 'https://via.placeholder.com/250x160'}" alt="${data.nama}">
+        <h3>${data.nama}</h3>
+        <p>${data.deskripsi}</p>
+        <p><strong>Rp${data.harga}</strong></p>
+        <button class="order-button" data-id="${data.id}">Tambah ke Pesanan</button>
+      `;
+      menuList.appendChild(card);
+    });
+
+    document.querySelectorAll('.order-button').forEach(button => {
+      button.addEventListener('click', function () {
+        const id = this.getAttribute('data-id');
+        const card = this.parentElement;
+        const item = {
+          id: id,
+          nama: card.querySelector('h3').innerText,
+          harga: card.querySelector('strong').innerText.replace('Rp', '').replace(/\./g, ''),
+          gambar: card.querySelector('img').src,
+          jumlah: 1
+        };
+
+        let keranjang = JSON.parse(localStorage.getItem("keranjang")) || [];
+        const existing = keranjang.find(menu => menu.id === item.id);
+        if (existing) {
+          existing.jumlah += 1;
+        } else {
+          keranjang.push(item);
+        }
+
+        localStorage.setItem("keranjang", JSON.stringify(keranjang));
+        updateCartCount();
+        alert("Menu ditambahkan ke keranjang!");
+      });
+    });
+  }
+
+  // Pencarian berdasarkan nama
+  document.getElementById("search-input").addEventListener("input", function () {
+    const keyword = this.value.toLowerCase();
+    const hasilFilter = semuaMenu.filter(item => item.nama.toLowerCase().includes(keyword));
+    tampilkanMenu(hasilFilter);
+  });
+</script>
+</body>
+</html>

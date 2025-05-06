@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bukti Pembayaran - Dapur Nyonya</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f9f4e7;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #b6462e;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .payment-details {
+      margin-bottom: 30px;
+    }
+
+    .payment-details p {
+      font-size: 1.1em;
+      margin: 10px 0;
+      color: #333;
+    }
+
+    .qr-code {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .qr-code img {
+      max-width: 250px;
+      height: auto;
+      margin-bottom: 20px;
+    }
+
+    .status {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 1.3em;
+      color: #4CAF50;
+      font-weight: bold;
+    }
+
+    .back-btn {
+      display: block;
+      text-align: center;
+      background-color: #b6462e;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      margin-top: 20px;
+      text-decoration: none;
+    }
+
+    .back-btn:hover {
+      background-color: #933921;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Bukti Pembayaran</h1>
+
+  <div class="container">
+    <div class="payment-details">
+      <p><strong>Terima kasih telah melakukan pembayaran.</strong></p>
+      <p>Pembayaran menggunakan QRIS telah berhasil.</p>
+      <p><strong>Detail Pembayaran:</strong></p>
+      <p>Metode Pembayaran: QRIS</p>
+      <p>Total Pembayaran: Rp<span id="total-bayar">0</span></p>
+      <p>Tanggal Pembayaran: <span id="payment-date">-</span></p>
+    </div>
+
+
+    <!-- Payment Success Status -->
+    <div class="status" id="status">Pembayaran Berhasil!</div>
+
+    <!-- Button to go back to the home page -->
+    <a href="index.html" class="back-btn">Kembali ke Halaman Utama</a>
+  </div>
+
+  <script>
+    // Mengambil data pesanan terakhir dari localStorage (atau bisa disesuaikan dari database)
+    const totalPembayaran = localStorage.getItem("totalPembayaran") || 0;
+    const paymentDate = new Date().toLocaleString();  // Tanggal pembayaran
+
+    // Menampilkan informasi pembayaran
+    document.getElementById("total-bayar").innerText = totalPembayaran.toLocaleString();
+    document.getElementById("payment-date").innerText = paymentDate;
+
+    // Menyimpan data pembayaran untuk kembali lagi ke halaman ini nanti (jika perlu)
+    localStorage.setItem("totalPembayaran", totalPembayaran);
+  </script>
+</body>
+</html>

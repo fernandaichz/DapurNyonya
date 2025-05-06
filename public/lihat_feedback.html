@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Feedback - Dapur Nyonya</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #fff8f0;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    header {
+      background-color: #b6462e;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2em;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px 15px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #b6462e;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f5f5f5;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      background-color: #fff;
+      border-radius: 10px;
+      color: #888;
+    }
+
+    footer {
+      background-color: #b6462e;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+<body>
+  <header>
+    <h1>Data Feedback Pengunjung</h1>
+  </header>
+
+  <div class="container">
+    <div id="feedback-table-container">
+      <div class="no-data" id="no-data">Memuat data...</div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Dapur Nyonya. All rights reserved.
+  </footer>
+
+  <script>
+    // Konfigurasi Firebase (ganti dengan konfigurasi proyek kamu)
+    const firebaseConfig = {
+      apiKey: "AIzaSyC7hWmV-OPp1APlKVHCp_yjvG0e8wsf-Ic",
+      authDomain: "websitedapurnyonya.firebaseapp.com",
+      projectId: "websitedapurnyonya",
+      storageBucket: "websitedapurnyonya.appspot.com",
+      messagingSenderId: "910833649328",
+      appId: "1:910833649328:web:3d779a479b55a26dfc5d75"
+    };
+
+    // Inisialisasi Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Ambil data feedback
+    db.collection("feedback").orderBy("timestamp", "desc").get().then((querySnapshot) => {
+      const container = document.getElementById("feedback-table-container");
+      const noData = document.getElementById("no-data");
+
+      if (querySnapshot.empty) {
+        noData.textContent = "Belum ada data feedback.";
+        return;
+      }
+
+      noData.style.display = "none";
+
+      let table = document.createElement("table");
+      let thead = `
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Email</th>
+            <th>Pesan</th>
+            <th>Waktu</th>
+          </tr>
+        </thead>
+      `;
+      table.innerHTML = thead;
+      let tbody = document.createElement("tbody");
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const timestamp = data.timestamp?.toDate().toLocaleString("id-ID") || "-";
+        let row = `
+          <tr>
+            <td>${data.name}</td>
+            <td>${data.email}</td>
+            <td>${data.message}</td>
+            <td>${timestamp}</td>
+          </tr>
+        `;
+        tbody.innerHTML += row;
+      });
+
+      table.appendChild(tbody);
+      container.appendChild(table);
+    }).catch((error) => {
+      document.getElementById("no-data").textContent = "Gagal mengambil data: " + error.message;
+    });
+  </script>
+</body>
+</html>
