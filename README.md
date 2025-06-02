@@ -19,3 +19,5 @@ Fernanda Ichza Wihansyah 23050974096
 Nafa ur Roisatu Rohmah 23050974094
 Hafizh Huwaidi Irawan 23050974112
 Rika Ichsani 23050974093
+
+link web: https://dapurnyonya-web.web.app/
